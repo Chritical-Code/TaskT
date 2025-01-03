@@ -1,5 +1,6 @@
 import curses
 from db.db_reader import DBReader
+from db.db_editer import DBEditer
 
 class Checklist:
     
@@ -15,13 +16,6 @@ class Checklist:
 
         self.items = self.ReadData()
         
-        #init checks
-        self.checks = []
-        i = 0
-        for item in self.items:
-            self.checks.append(" ")
-            i = i + 1
-        
         #init
         self.InitScreen()
         self.MainLoop()
@@ -35,6 +29,10 @@ class Checklist:
         self.body.s.clear()
         i = 0
         for item in self.items:
+            mark = " "
+            if item[3]:
+                mark = "X"
+            self.body.s.addstr(i, 0, mark)
             self.body.s.addstr(i, 2, item[1])
             i = i + 1
         self.body.s.move(0, (len(self.items[0][1]) + 2))
@@ -57,13 +55,16 @@ class Checklist:
                 option = option + 1
                 self.sound.PlaySound("nav")
             elif input == 10: #enter
-                if self.checks[option] == "X":
-                    self.checks[option] = " "
+                if self.items[option][3]:
+                    self.EditData(self.items[option][0], False)
+                    self.items = self.ReadData()
                     self.sound.PlaySound("bac")
+                    self.body.s.addstr(option, 0, " ")
                 else:
-                    self.checks[option] = "X"
+                    self.EditData(self.items[option][0], True)
+                    self.items = self.ReadData()
                     self.sound.PlaySound("com")
-                self.body.s.addstr(option, 0, self.checks[option])
+                    self.body.s.addstr(option, 0, "X")
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
@@ -89,5 +90,17 @@ class Checklist:
 
         info = db.ReadData(sql)
         return info
+    
+    def EditData(self, taskID, doneness):
+        db = DBEditer()
+
+        rSet = f"done = {doneness}"
+        condition = f"id = {taskID}"
+        sql = {
+            "table": "task",
+            "set": rSet,
+            "condition": condition
+        }
+        db.EditData(sql)
         
     
