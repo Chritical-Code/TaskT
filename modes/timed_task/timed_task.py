@@ -1,5 +1,6 @@
 import curses
 import time
+from db.db_editer import DBEditer
 
 class TimedTask:
     def __init__(self, task, header, body, footer, sound):
@@ -61,13 +62,15 @@ class TimedTask:
                 option = option + 1
                 self.sound.PlaySound("nav")
             elif input == 10: #enter
-                if option == 0:
+                if option == 0: #start
                     self.doTimer = True
                     self.sound.PlaySound("sel")
-                elif option == 1:
+                elif option == 1: #stop
                     self.doTimer = False
+                    self.SaveTimer()
                     self.sound.PlaySound("sel")
             elif input == ord('q'):
+                self.SaveTimer()
                 self.sound.PlaySound("bac")
                 break
             
@@ -139,5 +142,20 @@ class TimedTask:
             while self.minutes > 59:
                 self.hours = self.hours + 1
                 self.minutes = self.minutes - 60
+    
+    def SaveTimer(self):
+        db = DBEditer()
+
+        rSet = f"remainingTime = {self.GetRemainingTime()}"
+        condition = f"id = {self.task[0]}"
+        sql = {
+            "table": "timedTask",
+            "set": rSet,
+            "condition": condition
+        }
+        db.EditData(sql)
+    
+    def GetRemainingTime(self):
+        return (self.hours * 60 * 60) + (self.minutes * 60) + self.seconds
 
     

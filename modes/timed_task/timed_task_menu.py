@@ -19,6 +19,9 @@ class TimedTaskMenu:
 
     #init screen
     def InitScreen(self):
+        #re-read data
+        self.items = self.ReadData()
+
         #header
         self.header.ChangeTitle("Timed Tasks")
 
