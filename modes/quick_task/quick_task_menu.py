@@ -1,13 +1,13 @@
 import curses
 import random
 from db.db_reader import DBReader
+from db.db_editer import DBEditer
 from gameify.reward import Reward
 
 class QuickTaskMenu:
     def __init__(self, header, body, footer, sound):
         self.items = ["Your task is..."]
         self.tasks = self.ReadData()
-        self.completed = []
 
         #screens
         self.header = header
@@ -52,9 +52,9 @@ class QuickTaskMenu:
                 self.sound.PlaySound("nav")
             elif input == 10: #enter
                 if len(self.tasks) > currentTask and len(self.tasks) > 0:
-                    self.GiveRewards(self.tasks[currentTask])
-                    self.completed.append(self.tasks[currentTask])
-                    self.tasks.pop(currentTask)
+                    self.GiveRewards(self.tasks[currentTask]) #give rewards
+                    self.EditData(self.tasks[currentTask]) #mark task as complete
+                    self.tasks = self.ReadData() #reread tasks
                     currentTask = 999999999
                     self.body.s.move(0, 0)
                     self.body.s.clrtoeol()
@@ -98,3 +98,15 @@ class QuickTaskMenu:
     def GiveRewards(self, task):
         rw = Reward(task, self.header, self.body, self.footer, self.sound)
         self.InitScreen()
+
+    def EditData(self, task):
+        db = DBEditer()
+
+        rSet = f"done = {True}"
+        condition = f"id = {task[0]}"
+        sql = {
+            "table": "quickTask",
+            "set": rSet,
+            "condition": condition
+        }
+        db.EditData(sql)
