@@ -50,6 +50,9 @@ class Reward:
             elif input == ord('s'):
                 option = option + 1
                 self.sound.PlaySound("nav")
+            elif input == 10: #enter
+                self.sound.PlaySound("bac")
+                break
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
