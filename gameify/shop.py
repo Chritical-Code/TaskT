@@ -1,6 +1,7 @@
 import curses
 from db.db_reader import DBReader
 from db.db_editer import DBEditer
+from db.db_deleter import DBDeleter
 
 class Shop:
     
@@ -106,4 +107,15 @@ class Shop:
         self.header.ChangeTitle("Shop")
 
     def DeleteShopItem(self, option):
-        x = 0
+        db = DBDeleter()
+        
+        condition = f"ID = {self.data[option][0]}"
+        sql = {
+            "table": "shopItem",
+            "condition": condition
+        }
+        db.DeleteData(sql)
+
+        self.data.pop(option)
+        self.items.pop(option)
+        self.InitScreen()
