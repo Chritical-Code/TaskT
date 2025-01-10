@@ -10,6 +10,7 @@ class Header:
         self.s.keypad(True)
 
         #set user data
+        self.userData = 0
         self.SetUserData()
 
         #set text
@@ -36,3 +37,6 @@ class Header:
         money = userData[0][3]
         self.s.addstr(0, 0, f"Level: {1 + level:.0f}")
         self.s.addstr(0, 40, f"Money: {money}")
+
+        self.userData = userData
+        return

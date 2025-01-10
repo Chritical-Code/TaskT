@@ -1,5 +1,6 @@
 import curses
 from db.db_reader import DBReader
+from db.db_editer import DBEditer
 
 class Shop:
     
@@ -12,10 +13,6 @@ class Shop:
         self.body = body
         self.footer = footer
         self.sound = sound
-
-        self.level = 0
-        self.money = 0
-        self.ReadUserData()
 
         #init funcs
         self.InitScreen()
@@ -51,9 +48,7 @@ class Shop:
                 option = option + 1
                 self.sound.PlaySound("nav")
             elif input == 10: #enter
-                self.sound.PlaySound("com")
-                x = 0
-                #buy that thang
+                self.EditUserMoney(option)
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
@@ -86,15 +81,29 @@ class Shop:
             string = f"{dat[2]} - {dat[1]}"
             items.append(string)
         return items
-    
-    def ReadUserData(self):
-        db = DBReader()
 
-        condition = "ID = 0"
+    def EditUserMoney(self, option):
+        db = DBEditer()
+        amount = self.header.userData[0][3] - self.data[option][2]
+
+        #cancel if cant afford
+        if amount < 0:
+            self.sound.PlaySound("bac")
+            return
+        self.sound.PlaySound("com")
+
+        rSet = f"money = {amount}"
+        condition = f"id = 0"
         sql = {
             "table": "user",
+            "set": rSet,
             "condition": condition
         }
-        userData = db.ReadData(sql)
-        self.level = userData[0][2] / 1000
-        self.money = userData[0][3]
+        db.EditData(sql)
+
+        #delete shop item, refresh stats
+        self.DeleteShopItem(option)
+        self.header.ChangeTitle("Shop")
+
+    def DeleteShopItem(self, option):
+        x = 0
