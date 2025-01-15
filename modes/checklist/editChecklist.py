@@ -33,7 +33,7 @@ class EditChecklist:
         for item in self.items:
             self.body.s.addstr(i, 0, item[1])
             i = i + 1
-        self.body.s.move(0, (len(self.items[0][1])))
+        self.body.s.move(0, self.GetCursorPos(0))
         self.body.s.refresh()
 
         #footer
@@ -64,14 +64,14 @@ class EditChecklist:
                 self.stayEdit = False
                 break
             
-            #vertical bounds
-            if option < 0:
-                option = 0
+            #vertical bounds (zero friendly)
             if option >= len(self.items):
                 option = len(self.items) - 1
+            if option < 0:
+                option = 0
             
             #move cursor
-            self.body.s.move(option, (len(self.items[option][1])))
+            self.body.s.move(option, self.GetCursorPos(option))
             self.body.s.refresh()
     
     def ReadData(self):
@@ -122,3 +122,9 @@ class EditChecklist:
             "condition": condition
         }
         db.DeleteData(sql)
+
+    def GetCursorPos(self, option):
+        if len(self.items) > 0:
+            return len(self.items[option][1])
+        else:
+            return 0
