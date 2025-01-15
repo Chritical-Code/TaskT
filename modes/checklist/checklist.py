@@ -35,7 +35,7 @@ class Checklist:
             self.body.s.addstr(i, 0, mark)
             self.body.s.addstr(i, 2, item[1])
             i = i + 1
-        self.body.s.move(0, (len(self.items[0][1]) + 2))
+        self.body.s.move(0, self.GetCursorPos(0))
 
         #footer
         self.footer.ChangeFooter("Back (Q) - Check (Enter)")
@@ -55,28 +55,29 @@ class Checklist:
                 option = option + 1
                 self.sound.PlaySound("nav")
             elif input == 10: #enter
-                if self.items[option][3]:
-                    self.EditData(self.items[option][0], False)
-                    self.items = self.ReadData()
-                    self.sound.PlaySound("bac")
-                    self.body.s.addstr(option, 0, " ")
-                else:
-                    self.EditData(self.items[option][0], True)
-                    self.items = self.ReadData()
-                    self.sound.PlaySound("com")
-                    self.body.s.addstr(option, 0, "X")
+                if len(self.items) > 0:
+                    if self.items[option][3]:
+                        self.EditData(self.items[option][0], False)
+                        self.items = self.ReadData()
+                        self.sound.PlaySound("bac")
+                        self.body.s.addstr(option, 0, " ")
+                    else:
+                        self.EditData(self.items[option][0], True)
+                        self.items = self.ReadData()
+                        self.sound.PlaySound("com")
+                        self.body.s.addstr(option, 0, "X")
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
             
-            #vertical bounds
-            if option < 0:
-                option = 0
+            #vertical bounds (zero friendly)
             if option >= len(self.items):
                 option = len(self.items) - 1
+            if option < 0:
+                option = 0
             
             #move cursor
-            self.body.s.move(option, (len(self.items[option][1]) + 2))
+            self.body.s.move(option, self.GetCursorPos(option))
             self.body.s.refresh()
     
     def ReadData(self):
@@ -102,5 +103,10 @@ class Checklist:
             "condition": condition
         }
         db.EditData(sql)
-        
+    
+    def GetCursorPos(self, option):
+        if len(self.items) > 0:
+            return len(self.items[option][1]) + 2
+        else:
+            return 2
     

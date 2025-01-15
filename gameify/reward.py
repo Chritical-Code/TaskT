@@ -57,7 +57,7 @@ class Reward:
                 self.sound.PlaySound("bac")
                 break
             
-            #vertical bounds (modified slightly to support zero items)
+            #vertical bounds (zero friendly)
             if option >= len(self.items):
                 option = len(self.items) - 1
             if option < 0:
