@@ -30,7 +30,7 @@ class ChecklistMenu:
             i = i + 1
 
         #footer
-        self.footer.ChangeFooter("Back (Q) - Select (Enter) - Edit (H)")
+        self.footer.ChangeFooter("Back (Q) - Select (Enter) - Edit (E)")
         
         #move cursor to 1
         self.body.s.move(0, (len(self.items[0][1])))
@@ -47,17 +47,19 @@ class ChecklistMenu:
             elif input == ord('s'):
                 option = option + 1
                 self.sound.PlaySound("nav")
-            elif input == 10: #enter
+            elif input == 10: #enter open
                 self.sound.PlaySound("sel")
                 checkL = Checklist(self.items[option][1], self.items[option][0], self.header, self.body, self.footer, self.sound)
                 self.InitScreen()
-            elif input == ord('h'):
+            elif input == ord('e'): #edit
                 self.sound.PlaySound("sel")
                 stayEdit = True
                 while stayEdit:
                     editCL = EditChecklist(self.items[option], self.header, self.body, self.footer, self.sound)
                     self.InitScreen()
                     stayEdit = editCL.stayEdit
+            elif input == ord('h'): #toggle hidden
+                x = 0
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break

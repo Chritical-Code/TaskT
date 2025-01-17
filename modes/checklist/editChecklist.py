@@ -37,7 +37,7 @@ class EditChecklist:
         self.body.s.refresh()
 
         #footer
-        self.footer.ChangeFooter("Back (Q) - Add (H) - Delete (X)")
+        self.footer.ChangeFooter("Back (Q) - Add (E) - Delete (X)")
 
     
     def MainLoop(self):
@@ -50,12 +50,12 @@ class EditChecklist:
             elif input == ord('s'):
                 option = option + 1
                 self.sound.PlaySound("nav")
-            elif input == ord('h'):
+            elif input == ord('e'): #add
                 self.sound.PlaySound("sel")
                 self.AddMode()
                 self.sound.PlaySound("sel")
                 break
-            elif input == ord('x'):
+            elif input == ord('x'): #delete
                 self.sound.PlaySound("bac")
                 self.DeleteItem(option)
                 break
