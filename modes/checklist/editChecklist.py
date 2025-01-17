@@ -114,6 +114,10 @@ class EditChecklist:
         self.body.s.timeout(100)
 
     def DeleteItem(self, option):
+        #empty check
+        if len(self.items) < 1:
+            return
+
         db = DBDeleter()
         
         condition = f"ID = {self.items[option][0]}"
