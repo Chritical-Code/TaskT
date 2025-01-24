@@ -10,8 +10,9 @@ class ChecklistMenu:
         self.header = header
         self.body = body
         self.footer = footer
-        self.items = self.ReadData()
         self.sound = sound
+        self.hidden = False
+        self.items = self.ReadData()
 
         #init functions
         self.InitScreen()
@@ -30,10 +31,10 @@ class ChecklistMenu:
             i = i + 1
 
         #footer
-        self.footer.ChangeFooter("Back (Q) - Select (Enter) - Edit (E)")
+        self.footer.ChangeFooter("Back (Q) - Select (Enter) - Edit (E) - Toggle Hidden (H)")
         
         #move cursor to 1
-        self.body.s.move(0, (len(self.items[0][1])))
+        self.body.s.move(0, self.GetCursorPos(0))
         self.body.s.refresh
 
     
@@ -48,30 +49,34 @@ class ChecklistMenu:
                 option = option + 1
                 self.sound.PlaySound("nav")
             elif input == 10: #enter open
-                self.sound.PlaySound("sel")
-                checkL = Checklist(self.items[option][1], self.items[option][0], self.header, self.body, self.footer, self.sound)
-                self.InitScreen()
-            elif input == ord('e'): #edit
-                self.sound.PlaySound("sel")
-                stayEdit = True
-                while stayEdit:
-                    editCL = EditChecklist(self.items[option], self.header, self.body, self.footer, self.sound)
+                if len(self.items) > 0:
+                    self.sound.PlaySound("sel")
+                    checkL = Checklist(self.items[option][1], self.items[option][0], self.header, self.body, self.footer, self.sound)
                     self.InitScreen()
-                    stayEdit = editCL.stayEdit
+            elif input == ord('e'): #edit
+                if len(self.items) > 0:
+                    self.sound.PlaySound("sel")
+                    stayEdit = True
+                    while stayEdit:
+                        editCL = EditChecklist(self.items[option], self.header, self.body, self.footer, self.sound)
+                        self.InitScreen()
+                        stayEdit = editCL.stayEdit
             elif input == ord('h'): #toggle hidden
-                x = 0
+                self.hidden = not(self.hidden)
+                self.items = self.ReadData()
+                self.InitScreen()
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
             
-            #vertical bounds
-            if option < 0:
-                option = 0
+            #vertical bounds (zero friendly)
             if option >= len(self.items):
                 option = len(self.items) - 1
+            if option < 0:
+                option = 0
             
             #move cursor
-            self.body.s.move(option, (len(self.items[option][1])))
+            self.body.s.move(option, self.GetCursorPos(option))
             self.body.s.refresh()
     
     def ReadData(self):
@@ -84,4 +89,37 @@ class ChecklistMenu:
         }
 
         info = db.ReadData(sql)
-        return info
+        return self.SeperateData(info)
+    
+    def SeperateData(self, data):
+        #read in all tasks
+        db = DBReader()
+
+        condition = "5 = 5"
+        sql = {
+            "table": "task",
+            "condition": condition
+        }
+
+        tasks = db.ReadData(sql)
+        
+        #append hidden? items
+        rinsedList = []
+        i = 0
+        for dat in data:
+            include = False
+            for task in tasks:
+                if (task[2] == dat[0]) and not(task[3]):
+                    include = True
+            if include != self.hidden:
+                rinsedList.append(dat)
+            i = i + 1
+
+        #return list
+        return rinsedList
+    
+    def GetCursorPos(self, option):
+        if len(self.items) > 0:
+            return len(self.items[option][1])
+        else:
+            return 0
