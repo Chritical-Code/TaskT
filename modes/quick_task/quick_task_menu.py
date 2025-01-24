@@ -96,7 +96,7 @@ class QuickTaskMenu:
         return info
     
     def GiveRewards(self, task):
-        rw = Reward(task, self.header, self.body, self.footer, self.sound)
+        rw = Reward(task, "quickTask", self.header, self.body, self.footer, self.sound)
         self.InitScreen()
 
     def EditData(self, task):

@@ -1,12 +1,12 @@
 import curses
 from db.db_reader import DBReader
 from db.db_editer import DBEditer
+from gameify.reward import Reward
 
 class Checklist:
     
-    def __init__(self, title, clID, header, body, footer, sound):
-        self.title = title
-        self.clID = clID
+    def __init__(self, checklist, header, body, footer, sound):
+        self.checklist = checklist
         
         #screens
         self.header = header
@@ -23,7 +23,7 @@ class Checklist:
     #init screen
     def InitScreen(self):
         #header
-        self.header.ChangeTitle(self.title)
+        self.header.ChangeTitle(self.checklist[1])
 
         #body
         self.body.s.clear()
@@ -69,6 +69,15 @@ class Checklist:
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
+
+            #reward and close if list is complete
+            complete = True
+            for item in self.items:
+                if not(item[3]):
+                    complete = False
+            if complete:
+                self.GiveRewards(self.checklist) #give rewards
+                break
             
             #vertical bounds (zero friendly)
             if option >= len(self.items):
@@ -83,7 +92,7 @@ class Checklist:
     def ReadData(self):
         db = DBReader()
 
-        condition = "checklistID = " + str(self.clID)
+        condition = "checklistID = " + str(self.checklist[0])
         sql = {
             "table": "task",
             "condition": condition
@@ -109,4 +118,8 @@ class Checklist:
             return len(self.items[option][1]) + 2
         else:
             return 2
+        
+    def GiveRewards(self, task):
+        rw = Reward(task, "checklist", self.header, self.body, self.footer, self.sound)
+        self.InitScreen()
     

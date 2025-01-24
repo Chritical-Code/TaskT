@@ -51,7 +51,7 @@ class ChecklistMenu:
             elif input == 10: #enter open
                 if len(self.items) > 0:
                     self.sound.PlaySound("sel")
-                    checkL = Checklist(self.items[option][1], self.items[option][0], self.header, self.body, self.footer, self.sound)
+                    checkL = Checklist(self.items[option], self.header, self.body, self.footer, self.sound)
                     self.InitScreen()
             elif input == ord('e'): #edit
                 if len(self.items) > 0:

@@ -3,8 +3,9 @@ from db.db_reader import DBReader
 from db.db_editer import DBEditer
 
 class Reward:
-    def __init__(self, task, header, body, footer, sound):
+    def __init__(self, task, mode, header, body, footer, sound):
         self.task = task
+        self.mode = mode
         
         #screens/windows
         self.header = header
@@ -71,7 +72,7 @@ class Reward:
     def ReadData(self):
         db = DBReader()
 
-        condition = f"mode = 'quickTask' AND taskID = {self.task[0]}"
+        condition = f"mode = '{self.mode}' AND taskID = {self.task[0]}"
         sql = {
             "table": "reward",
             "condition": condition
