@@ -64,7 +64,7 @@ class Checklist:
                     else:
                         self.EditData(self.items[option][0], True)
                         self.items = self.ReadData()
-                        self.sound.PlaySound("com")
+                        self.sound.PlaySound("sel")
                         self.body.s.addstr(option, 0, "X")
                     if self.Completed():
                         self.GiveRewards(self.checklist) #give rewards
