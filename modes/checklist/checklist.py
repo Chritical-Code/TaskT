@@ -66,19 +66,14 @@ class Checklist:
                         self.items = self.ReadData()
                         self.sound.PlaySound("com")
                         self.body.s.addstr(option, 0, "X")
+                    if self.Completed():
+                        self.GiveRewards(self.checklist) #give rewards
+                        break
+            
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
 
-            #reward and close if list is complete
-            complete = True
-            for item in self.items:
-                if not(item[3]):
-                    complete = False
-            if complete:
-                self.GiveRewards(self.checklist) #give rewards
-                break
-            
             #vertical bounds (zero friendly)
             if option >= len(self.items):
                 option = len(self.items) - 1
@@ -122,4 +117,11 @@ class Checklist:
     def GiveRewards(self, task):
         rw = Reward(task, "checklist", self.header, self.body, self.footer, self.sound)
         self.InitScreen()
+
+    def Completed(self):
+        complete = True
+        for item in self.items:
+            if not(item[3]):
+                complete = False
+        return complete
     

@@ -20,6 +20,8 @@ class ChecklistMenu:
 
     #init screen
     def InitScreen(self):
+        self.items = self.ReadData()
+        
         #header
         self.header.ChangeTitle("Checklists")
         
