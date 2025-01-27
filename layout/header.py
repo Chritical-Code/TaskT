@@ -20,7 +20,8 @@ class Header:
     def ChangeTitle(self, inTitle):
         self.s.clear()
         self.SetUserData()
-        self.s.addstr(1, 20, inTitle)
+        center = int((self.s.getmaxyx()[1] / 2) - (len(inTitle) / 2))
+        self.s.addstr(1, center, inTitle)
         self.s.refresh()
 
     #reread and set the user data
@@ -33,10 +34,15 @@ class Header:
         }
         userData = db.ReadData(sql)
 
+        #level formatting
         level = userData[0][2] / 1000
+        self.s.addstr(0, 1, f"Level: {1 + level:.0f}")
+
+        #money formatting
         money = userData[0][3]
-        self.s.addstr(0, 0, f"Level: {1 + level:.0f}")
-        self.s.addstr(0, 40, f"Money: {money}")
+        moneyText = f"Money: {money}"
+        right = (self.s.getmaxyx()[1]) - len(moneyText) - 1
+        self.s.addstr(0, right, moneyText)
 
         self.userData = userData
         return
