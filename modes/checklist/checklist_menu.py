@@ -62,8 +62,8 @@ class ChecklistMenu:
                     stayEdit = True
                     while stayEdit:
                         editCL = EditChecklist(self.items[option], self.header, self.body, self.footer, self.sound)
-                        self.InitScreen()
                         stayEdit = editCL.stayEdit
+                    self.InitScreen()
             elif input == ord('h'): #toggle hidden
                 self.sound.PlaySound("sel")
                 self.hidden = not(self.hidden)
