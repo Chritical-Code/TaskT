@@ -13,6 +13,7 @@ class ChecklistMenu:
         self.sound = sound
         self.hidden = False
         self.items = self.ReadData()
+        self.title = "Checklists"
 
         #init functions
         self.InitScreen()
@@ -23,7 +24,7 @@ class ChecklistMenu:
         self.items = self.ReadData()
         
         #header
-        self.header.ChangeTitle("Checklists")
+        self.header.ChangeTitle(self.title)
         
         #body
         self.body.s.clear()
@@ -64,7 +65,12 @@ class ChecklistMenu:
                         self.InitScreen()
                         stayEdit = editCL.stayEdit
             elif input == ord('h'): #toggle hidden
+                self.sound.PlaySound("sel")
                 self.hidden = not(self.hidden)
+                if self.hidden:
+                    self.title = "Checklists (Hidden)"
+                else:
+                    self.title = "Checklists"
                 self.items = self.ReadData()
                 self.InitScreen()
             elif input == ord('q'):
