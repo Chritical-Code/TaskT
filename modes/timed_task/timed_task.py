@@ -1,11 +1,12 @@
 import curses
 import time
 from db.db_editer import DBEditer
+from gameify.reward import Reward
 
 class TimedTask:
     def __init__(self, task, header, body, footer, sound):
         self.task = task
-        self.items = ["Start", "Stop"]
+        self.items = ["Start", "Stop", "Finish"]
 
         #screens
         self.header = header
@@ -67,10 +68,15 @@ class TimedTask:
                     self.sound.PlaySound("sel")
                 elif option == 1: #stop
                     self.doTimer = False
-                    self.SaveTimer()
+                    self.DB_SaveTimer()
                     self.sound.PlaySound("sel")
+                elif option == 2: #finish
+                    self.DB_SaveTimer()
+                    self.DB_FinishTask()
+                    self.GiveRewards(self.task)
+                    break
             elif input == ord('q'):
-                self.SaveTimer()
+                self.DB_SaveTimer()
                 self.sound.PlaySound("bac")
                 break
             
@@ -143,7 +149,7 @@ class TimedTask:
                 self.hours = self.hours + 1
                 self.minutes = self.minutes - 60
     
-    def SaveTimer(self):
+    def DB_SaveTimer(self):
         db = DBEditer()
 
         rSet = f"remainingTime = {self.GetRemainingTime()}"
@@ -157,5 +163,21 @@ class TimedTask:
     
     def GetRemainingTime(self):
         return (self.hours * 60 * 60) + (self.minutes * 60) + self.seconds
+    
+    def DB_FinishTask(self):
+        db = DBEditer()
+
+        rSet = f"done = {True}"
+        condition = f"id = {self.task[0]}"
+        sql = {
+            "table": "timedTask",
+            "set": rSet,
+            "condition": condition
+        }
+        db.EditData(sql)
+
+    def GiveRewards(self, task):
+        rw = Reward(task, "timedTask", self.header, self.body, self.footer, self.sound)
+        self.InitScreen()
 
     
