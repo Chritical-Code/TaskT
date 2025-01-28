@@ -5,6 +5,8 @@ from db.db_reader import DBReader
 
 class TimedTaskMenu:
     def __init__(self, header, body, footer, sound):
+        self.hidden = False
+        self.title = "Timed Tasks"
         self.items = self.ReadData()
 
         #screens
@@ -23,7 +25,7 @@ class TimedTaskMenu:
         self.items = self.ReadData()
 
         #header
-        self.header.ChangeTitle("Timed Tasks")
+        self.header.ChangeTitle(self.title)
 
         #body
         self.body.s.clear()
@@ -31,10 +33,10 @@ class TimedTaskMenu:
         for item in self.items:
             self.body.s.addstr(i, 0, item[1])
             i = i + 1
-        self.body.s.move(0, (len(self.items[0][1])))
+        self.body.s.move(0, self.GetCursorPos(0))
 
         #footer
-        self.footer.ChangeFooter("Back (Q) - Select (Enter)")
+        self.footer.ChangeFooter("Back (Q) - Select (Enter) - Toggle Hidden (H)")
         
         self.body.s.refresh()
 
@@ -50,22 +52,30 @@ class TimedTaskMenu:
                 option = option + 1
                 self.sound.PlaySound("nav")
             elif input == 10: #enter
-                if option == option: #will need modification
+                if len(self.items) > 0:
                     self.sound.PlaySound("sel")
                     timedT = TimedTask(self.items[option], self.header, self.body, self.footer, self.sound)
                     self.InitScreen()
+            elif input == ord('h'): #hidden
+                self.sound.PlaySound("sel")
+                self.hidden = not(self.hidden)
+                if self.hidden:
+                    self.title = "Timed Tasks (Hidden)"
+                else:
+                    self.title = "Timed Tasks"
+                self.InitScreen()
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
             
-            #vertical bounds
-            if option < 0:
-                option = 0
+            #vertical bounds (zero friendly)
             if option >= len(self.items):
                 option = len(self.items) - 1
+            if option < 0:
+                option = 0
             
             #move cursor
-            self.body.s.move(option, (len(self.items[option][1])))
+            self.body.s.move(option, self.GetCursorPos(option))
             self.body.s.refresh()
     
     def ReadData(self):
@@ -76,8 +86,18 @@ class TimedTaskMenu:
             "table": "timedTask",
             "condition": condition
         }
-
         info = db.ReadData(sql)
-        return info
+
+        rinsedInfo = []
+        for inf in info:
+            if inf[4] == self.hidden:
+                rinsedInfo.append(inf)
+
+        return rinsedInfo
     
+    def GetCursorPos(self, option):
+        if len(self.items) > 0:
+            return len(self.items[option][1])
+        else:
+            return 0
     
