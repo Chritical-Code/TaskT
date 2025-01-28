@@ -6,6 +6,8 @@ from db.db_deleter import DBDeleter
 class Shop:
     
     def __init__(self, header, body, footer, sound):
+        self.hidden = False
+        self.title = "Shop"
         self.data = self.ReadData()
         self.items = self.MakeList()
 
@@ -21,8 +23,12 @@ class Shop:
 
     #init screen
     def InitScreen(self):
+        #re read
+        self.data = self.ReadData()
+        self.items = self.MakeList()
+
         #header
-        self.header.ChangeTitle("Shop")
+        self.header.ChangeTitle(self.title)
         
         #body
         self.body.s.clear()
@@ -30,10 +36,10 @@ class Shop:
         for item in self.items:
             self.body.s.addstr(i, 0, item)
             i = i + 1
-        self.body.s.move(0, (len(self.items[0])))
+        self.body.s.move(0, self.GetCursorPos(0))
 
         #footer
-        self.footer.ChangeFooter("Back (Q) - Buy (Enter)")
+        self.footer.ChangeFooter("Back (Q) - Buy (Enter) - Toggle Hidden (H)")
         
         self.body.s.refresh()
 
@@ -49,19 +55,30 @@ class Shop:
                 option = option + 1
                 self.sound.PlaySound("nav")
             elif input == 10: #enter
-                self.EditUserMoney(option)
+                if len(self.items) > 0 and not self.hidden:
+                    self.EditUserMoney(option)
+                    self.DB_MarkBought(self.data[option])
+                    self.InitScreen()
+            elif input == ord('h'):
+                self.sound.PlaySound("sel")
+                self.hidden = not(self.hidden)
+                if not self.hidden:
+                    self.title = "Shop"
+                else:
+                    self.title = "Shop (Hidden)"
+                self.InitScreen()
             elif input == ord('q'):
                 self.sound.PlaySound("bac")
                 break
             
-            #vertical bounds
-            if option < 0:
-                option = 0
+            #vertical bounds (zero friendly)
             if option >= len(self.items):
                 option = len(self.items) - 1
+            if option < 0:
+                option = 0
             
             #move cursor
-            self.body.s.move(option, (len(self.items[option])))
+            self.body.s.move(option, self.GetCursorPos(option))
             self.body.s.refresh()
     
     def ReadData(self):
@@ -74,7 +91,14 @@ class Shop:
         }
 
         info = db.ReadData(sql)
-        return info
+
+        #append purchased items
+        info2 = []
+        for inf in info:
+            if inf[3] == self.hidden:
+                info2.append(inf)
+
+        return info2
     
     def MakeList(self):
         items = []
@@ -102,8 +126,7 @@ class Shop:
         }
         db.EditData(sql)
 
-        #delete shop item, refresh stats
-        self.DeleteShopItem(option)
+        #refresh stats
         self.header.ChangeTitle("Shop")
 
     def DeleteShopItem(self, option):
@@ -119,3 +142,21 @@ class Shop:
         self.data.pop(option)
         self.items.pop(option)
         self.InitScreen()
+    
+    def DB_MarkBought(self, item):
+        db = DBEditer()
+
+        rSet = f"bought = {True}"
+        condition = f"id = {item[0]}"
+        sql = {
+            "table": "shopItem",
+            "set": rSet,
+            "condition": condition
+        }
+        db.EditData(sql)
+
+    def GetCursorPos(self, option):
+        if len(self.items) > 0:
+            return len(self.items[option])
+        else:
+            return 0
