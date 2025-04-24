@@ -1,0 +1,12 @@
+project - complete current incomplete features
+
++multiple
+-adding data
+-editing/removing data?
+-standardize cursor
+-standardize specific reused things: empties, 
+-full standardization
+
+
++settings menu
+-theme picker

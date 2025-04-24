@@ -1,0 +1,13 @@
+Current project: work on python and git
+3: work on project
+-finish incomplete features
+
+4: learn git ignore file
+-add it
+
+5: add cloud git to project
+-discover best way to do it
+-add it
+-use it
+
+7: re-evaluate
