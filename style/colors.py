@@ -43,6 +43,6 @@ class Colors:
         curses.init_pair(11, 2, 11)
 
         #set colors
-        header.bkgd(' ', curses.color_pair(10))
-        body.bkgd(' ', curses.color_pair(11))
-        footer.bkgd(' ', curses.color_pair(10))
+        header.bkgd(' ', curses.color_pair(2))
+        body.bkgd(' ', curses.color_pair(3))
+        footer.bkgd(' ', curses.color_pair(2))

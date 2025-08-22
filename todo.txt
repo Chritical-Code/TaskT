@@ -1,13 +1,9 @@
-Current project: work on python and git
-3: work on project
--finish incomplete features
+Now:
++
 
-4: learn git ignore file
--add it
 
-5: add cloud git to project
--discover best way to do it
--add it
--use it
-
-7: re-evaluate
+Changes:
++full list and item making/deleting in app (including rewards)
++theme changing in app
++consider more interesting visual styles
++switch to arrow keys (and centralize controls)
